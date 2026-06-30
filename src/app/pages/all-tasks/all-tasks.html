@@ -1,0 +1,44 @@
+<div class="task-table">
+  <h2>All Tasks</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Status</th>
+        <th>Priority</th>
+        <th>Due Date</th>
+      </tr>
+    </thead>
+    <tbody>
+<tr *ngFor="let task of taskService.tasks$ | async">
+        <td>{{ task.title }}</td>
+        <td>
+          <span
+            class="badge"
+            [ngClass]="{
+              'status-progress': task.status === 'In Progress',
+              'status-completed': task.status === 'Completed',
+              'status-pending': task.status === 'Pending'
+            }"
+          >
+            {{ task.status }}
+          </span>
+        </td>
+        <td>
+          <span
+            class="badge"
+            [ngClass]="{
+              'priority-high': task.priority === 'High',
+              'priority-medium': task.priority === 'Medium',
+              'priority-low': task.priority === 'Low'
+            }"
+          >
+            {{ task.priority }}
+          </span>
+        </td>
+        <td>{{ task.dueDate }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

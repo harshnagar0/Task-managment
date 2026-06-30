@@ -1,0 +1,182 @@
+<div class="dashboard-page">
+  <div class="dashboard-header">
+    <div>
+      <p class="eyebrow">Workspace overview</p>
+      <h1>Task Management Dashboard</h1>
+    </div>
+
+    <button class="add-task-btn" (click)="toggleForm()">
+      + Add New Task
+    </button>
+  </div>
+
+  <div class="filter-bar">
+    <input type="text" placeholder="Search by task title" [(ngModel)]="searchText" />
+
+    <select [(ngModel)]="statusFilter">
+      <option value="All">All Status</option>
+      <option value="Pending">Pending</option>
+      <option value="In Progress">In Progress</option>
+      <option value="Completed">Completed</option>
+    </select>
+
+    <select [(ngModel)]="priorityFilter">
+      <option value="All">All Priority</option>
+      <option value="High">High</option>
+      <option value="Medium">Medium</option>
+      <option value="Low">Low</option>
+    </select>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <p>Total Tasks</p>
+      <h2>{{ totalTasks }}</h2>
+    </div>
+
+    <div class="stat-card progress">
+      <p>In Progress</p>
+      <h2>{{ inProgressTasks }}</h2>
+    </div>
+
+    <div class="stat-card completed">
+      <p>Completed</p>
+      <h2>{{ completedTasks }}</h2>
+    </div>
+
+    <div class="stat-card pending">
+      <p>Pending</p>
+      <h2>{{ pendingTasks }}</h2>
+    </div>
+  </div>
+
+  <div class="modal-overlay" *ngIf="showForm" (click)="toggleForm()">
+    <div class="task-modal" role="dialog" aria-modal="true" aria-labelledby="taskModalTitle"
+      (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 id="taskModalTitle">
+          {{ editingTaskId !== null ? 'Edit Task' : 'Add New Task' }}
+        </h3>
+
+        <button class="close-btn" (click)="toggleForm()">×</button>
+      </div>
+
+      <div class="form-grid">
+        <input type="text" placeholder="Task title" [(ngModel)]="newTask.title" />
+
+        <input type="date" [(ngModel)]="newTask.dueDate" />
+
+        <select [(ngModel)]="newTask.status">
+          <option value="Pending">Pending</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Completed">Completed</option>
+        </select>
+
+        <select [(ngModel)]="newTask.priority">
+          <option value="High">High</option>
+          <option value="Medium">Medium</option>
+          <option value="Low">Low</option>
+        </select>
+      </div>
+
+      <div class="form-actions">
+        <button class="primary-btn" (click)="addOrUpdateTask()" [disabled]="savingTask">
+          {{
+    savingTask
+      ? (editingTaskId !== null ? 'Updating...' : 'Saving...')
+      : (editingTaskId !== null ? 'Update Task' : 'Save Task')
+  }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-header">
+      <div>
+        <p class="eyebrow">Task list</p>
+        <h2>Recent Tasks</h2>
+      </div>
+    </div>
+
+    <div *ngIf="isLoading" class="loading-state">
+      <div class="skeleton-row" *ngFor="let item of [1, 2, 3, 4, 5]">
+        <div class="skeleton skeleton-text long"></div>
+        <div class="skeleton skeleton-badge"></div>
+        <div class="skeleton skeleton-badge"></div>
+        <div class="skeleton skeleton-text short"></div>
+        <div class="skeleton skeleton-actions"></div>
+      </div>
+    </div>
+
+    <div *ngIf="!isLoading && errorMessage" class="error-state">
+      {{ errorMessage }}
+    </div>
+
+    <div *ngIf="!isLoading && !errorMessage" class="table-wrapper">
+      <table *ngIf="filteredTasks.length > 0; else emptyState">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Status</th>
+            <th>Priority</th>
+            <th>Due Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let task of filteredTasks | slice: 0.3">
+            <td class="task-title">{{ task.title }}</td>
+
+            <td>
+              <span class="badge" [ngClass]="{
+                  'badge-progress': task.status === 'In Progress',
+                  'badge-completed': task.status === 'Completed',
+                  'badge-pending': task.status === 'Pending'
+                }">
+                {{ task.status }}
+              </span>
+            </td>
+
+            <td>
+              <span class="badge" [ngClass]="{
+                  'priority-high': task.priority === 'High',
+                  'priority-medium': task.priority === 'Medium',
+                  'priority-low': task.priority === 'Low'
+                }">
+                {{ task.priority }}
+              </span>
+            </td>
+
+            <td>{{ task.dueDate }}</td>
+
+            <td class="actions">
+              <button class="table-btn edit" (click)="editTask(task)"
+                [disabled]="deletingTaskId === task.id || completingTaskId === task.id">
+                Edit
+              </button>
+
+              <button class="table-btn done" (click)="markAsCompleted(task)"
+                [disabled]="completingTaskId === task.id || deletingTaskId === task.id || task.status === 'Completed'">
+                {{ completingTaskId === task.id ? 'Updating...' : 'Done' }}
+              </button>
+
+              <button class="table-btn delete" (click)="deleteTask(task.id)"
+                [disabled]="deletingTaskId === task.id || completingTaskId === task.id">
+                {{ deletingTaskId === task.id ? 'Deleting...' : 'Delete' }}
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <ng-template #emptyState>
+        <div class="empty-state">
+          <h3>No tasks found</h3>
+          <p>Add a new task or adjust your filters.</p>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>
