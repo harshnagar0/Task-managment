@@ -1,0 +1,12 @@
+<button
+  [type]="type"
+  [disabled]="disabled"
+  [ngClass]="[
+    'ui-btn',
+    'ui-btn-' + variant,
+    fullWidth ? 'ui-btn-full' : ''
+  ]"
+  (click)="handleClick()"
+>
+  {{ label }}
+</button>

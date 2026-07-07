@@ -1,0 +1,70 @@
+<div class="table-shell">
+  <div *ngIf="loading" class="loading-state">
+    <div class="skeleton-row" *ngFor="let item of [1, 2, 3, 4, 5]">
+      <div class="skeleton skeleton-text long"></div>
+      <div class="skeleton skeleton-badge"></div>
+      <div class="skeleton skeleton-badge"></div>
+      <div class="skeleton skeleton-text short"></div>
+      <div class="skeleton skeleton-actions"></div>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && errorMessage" class="error-state">
+    {{ errorMessage }}
+  </div>
+
+  <div *ngIf="!loading && !errorMessage && hasLoaded" class="table-wrapper">
+    <table *ngIf="data.length > 0; else emptyState">
+      <thead>
+        <tr>
+          <th *ngFor="let column of columns">{{ column.label }}</th>
+          <th *ngIf="actions.length > 0">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let row of data">
+          <td *ngFor="let column of columns">
+            <ng-container [ngSwitch]="column.type">
+              <app-badge
+                *ngSwitchCase="'status-badge'"
+                [text]="getCellValue(row, column.key)"
+                [variant]="getStatusVariant(getCellValue(row, column.key))"
+              ></app-badge>
+
+              <app-badge
+                *ngSwitchCase="'priority-badge'"
+                [text]="getCellValue(row, column.key)"
+                [variant]="getPriorityVariant(getCellValue(row, column.key))"
+              ></app-badge>
+
+              <span
+                *ngSwitchDefault
+                [ngClass]="{ 'task-title': column.key === 'title' }"
+              >
+                {{ getCellValue(row, column.key) }}
+              </span>
+            </ng-container>
+          </td>
+
+          <td *ngIf="actions.length > 0" class="actions">
+            <app-button
+              *ngFor="let action of actions"
+              [label]="getActionLabel(action, row)"
+              [variant]="action.variant"
+              [disabled]="isActionDisabled(action, row)"
+              (buttonClick)="onActionClick(action.actionKey, row)"
+            ></app-button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ng-template #emptyState>
+      <div class="empty-state">
+        <h3>{{ emptyTitle }}</h3>
+        <p>{{ emptyMessage }}</p>
+      </div>
+    </ng-template>
+  </div>
+</div>

@@ -1,0 +1,9 @@
+<div
+  class="ui-card"
+  [ngClass]="[
+    'ui-card-' + variant,
+    padded ? 'ui-card-padded' : ''
+  ]"
+>
+  <ng-content></ng-content>
+</div>

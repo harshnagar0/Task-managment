@@ -1,0 +1,28 @@
+<ng-container *ngIf="isOpen">
+  <div class="modal-overlay" (click)="onOverlayClick()">
+    <div
+      class="modal-container"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-label]="title"
+      (click)="stopPropagation($event)"
+    >
+      <div class="modal-header">
+        <h3>{{ title }}</h3>
+
+        <button
+          type="button"
+          class="close-btn"
+          aria-label="Close modal"
+          (click)="onCloseClick()"
+        >
+          ×
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <ng-content></ng-content>
+      </div>
+    </div>
+  </div>
+</ng-container>

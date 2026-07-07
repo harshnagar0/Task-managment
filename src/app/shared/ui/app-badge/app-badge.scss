@@ -1,0 +1,37 @@
+.ui-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.ui-badge-progress {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.ui-badge-completed {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.ui-badge-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.ui-badge-high {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.ui-badge-medium {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.ui-badge-low {
+  background: #e0f2fe;
+  color: #0369a1;
+}

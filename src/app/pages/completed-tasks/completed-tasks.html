@@ -9,25 +9,20 @@
         <th>Due Date</th>
       </tr>
     </thead>
+
     <tbody>
-      <tr *ngFor="let task of (taskService.tasks$ | async)">
-        <ng-container *ngIf="task.status === 'Completed'">
+      <ng-container *ngFor="let task of (completedTasks$ | async)">
+        <tr>
           <td>{{ task.title }}</td>
           <td>
-            <span
-              class="badge"
-              [ngClass]="{
-                'priority-high': task.priority === 'High',
-                'priority-medium': task.priority === 'Medium',
-                'priority-low': task.priority === 'Low'
-              }"
-            >
-              {{ task.priority }}
-            </span>
+            <app-badge
+              [text]="task.priority"
+              [variant]="getPriorityVariant(task.priority)"
+            ></app-badge>
           </td>
           <td>{{ task.dueDate }}</td>
-        </ng-container>
-      </tr>
+        </tr>
+      </ng-container>
     </tbody>
   </table>
 </div>

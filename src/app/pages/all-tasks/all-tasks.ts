@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TaskService } from '../../services/task';
+import { AppBadgeComponent } from '../../shared/ui/app-badge/app-badge';
 
 @Component({
   selector: 'app-all-tasks',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, AppBadgeComponent],
   templateUrl: './all-tasks.html',
   styleUrls: ['./all-tasks.scss']
 })

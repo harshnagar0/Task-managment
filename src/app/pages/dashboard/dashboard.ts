@@ -1,16 +1,32 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import { Task, TaskService } from '../../services/task';
+import { AppButtonComponent } from '../../shared/ui/app-button/app-button';
+import { AppCardComponent } from '../../shared/ui/app-card/app-card';
+import {
+  AppTableComponent,
+  TableAction,
+  TableColumn,
+} from '../../shared/ui/app-table/app-table';
+import { AppModalComponent } from '../../shared/ui/app-modal/app-modal';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    AppButtonComponent,
+    AppCardComponent,
+    AppTableComponent,
+    AppModalComponent,
+  ],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.scss'],
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
   showForm = false;
   editingTaskId: number | null = null;
 
@@ -21,13 +37,48 @@ export class DashboardComponent implements OnInit {
   tasks: Task[] = [];
 
   isLoading = false;
+  hasLoaded = false;
   errorMessage = '';
 
   deletingTaskId: number | null = null;
   completingTaskId: number | null = null;
   savingTask = false;
 
-  private loaderDelayTimeout: ReturnType<typeof setTimeout> | null = null;
+  private tasksSubscription?: Subscription;
+
+  tableColumns: TableColumn[] = [
+    { key: 'title', label: 'Title', type: 'text' },
+    { key: 'status', label: 'Status', type: 'status-badge' },
+    { key: 'priority', label: 'Priority', type: 'priority-badge' },
+    { key: 'dueDate', label: 'Due Date', type: 'text' },
+  ];
+
+  tableActions: TableAction[] = [
+    { label: 'Edit', variant: 'secondary', actionKey: 'edit' },
+    { label: 'Done', variant: 'success', actionKey: 'complete' },
+    { label: 'Delete', variant: 'danger', actionKey: 'delete' },
+  ];
+
+  disabledActionMap = {
+    edit: (task: Task) =>
+      this.deletingTaskId === task.id || this.completingTaskId === task.id,
+
+    complete: (task: Task) =>
+      this.completingTaskId === task.id ||
+      this.deletingTaskId === task.id ||
+      task.status === 'Completed',
+
+    delete: (task: Task) =>
+      this.deletingTaskId === task.id || this.completingTaskId === task.id,
+  };
+
+  dynamicLabelMap = {
+    complete: (task: Task) =>
+      this.completingTaskId === task.id ? 'Updating...' : 'Done',
+
+    delete: (task: Task) =>
+      this.deletingTaskId === task.id ? 'Deleting...' : 'Delete',
+  };
 
   newTask: Omit<Task, 'id'> = {
     title: '',
@@ -38,43 +89,37 @@ export class DashboardComponent implements OnInit {
 
   constructor(public taskService: TaskService) {}
 
- ngOnInit(): void {
-  this.taskService.tasks$.subscribe((tasks) => {
-    this.tasks = tasks;
-  });
+  ngOnInit(): void {
+    this.isLoading = true;
+    this.hasLoaded = false;
 
-  if (this.taskService.currentTasks.length === 0) {
-    this.taskService.loadTasks().subscribe();
+    this.tasksSubscription = this.taskService.tasks$.subscribe((tasks) => {
+      this.tasks = [...tasks];
+    });
+
+    this.loadTasks();
   }
-}
+
+  ngOnDestroy(): void {
+    this.tasksSubscription?.unsubscribe();
+  }
 
   loadTasks(): void {
     this.errorMessage = '';
-
-    this.clearLoaderDelay();
-    this.loaderDelayTimeout = setTimeout(() => {
-      this.isLoading = true;
-    }, 250);
+    this.isLoading = true;
 
     this.taskService.loadTasks().subscribe({
       next: () => {
-        this.clearLoaderDelay();
         this.isLoading = false;
+        this.hasLoaded = true;
       },
       error: (err) => {
-        this.clearLoaderDelay();
         console.error('Load tasks error:', err);
         this.errorMessage = 'Unable to load tasks. Please try again.';
         this.isLoading = false;
+        this.hasLoaded = true;
       },
     });
-  }
-
-  clearLoaderDelay(): void {
-    if (this.loaderDelayTimeout) {
-      clearTimeout(this.loaderDelayTimeout);
-      this.loaderDelayTimeout = null;
-    }
   }
 
   get filteredTasks(): Task[] {
@@ -94,7 +139,8 @@ export class DashboardComponent implements OnInit {
       })
       .sort(
         (a, b) => this.getDateValue(a.dueDate) - this.getDateValue(b.dueDate)
-      );
+      )
+      .slice(0, 3);
   }
 
   get totalTasks(): number {
@@ -229,6 +275,20 @@ export class DashboardComponent implements OnInit {
         this.completingTaskId = null;
       },
     });
+  }
+
+  onTableAction(event: { actionKey: string; row: Task }): void {
+    if (event.actionKey === 'edit') {
+      this.editTask(event.row);
+    }
+
+    if (event.actionKey === 'complete') {
+      this.markAsCompleted(event.row);
+    }
+
+    if (event.actionKey === 'delete') {
+      this.deleteTask(event.row.id);
+    }
   }
 
   resetForm(): void {

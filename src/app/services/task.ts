@@ -26,11 +26,14 @@ export class TaskService {
     return this.tasksSubject.value;
   }
 
-  loadTasks(): Observable<Task[]> {
-    return this.http.get<Task[]>(this.apiUrl).pipe(
-      tap((tasks) => this.tasksSubject.next(tasks))
-    );
-  }
+ loadTasks(): Observable<Task[]> {
+  return this.http.get<Task[]>(this.apiUrl).pipe(
+    tap((tasks) => {
+      console.log('Service response:', tasks);
+      this.tasksSubject.next(tasks);
+    })
+  );
+}
 
   addTask(task: Omit<Task, 'id'>): Observable<Task> {
     return this.http.post<Task>(this.apiUrl, task).pipe(

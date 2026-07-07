@@ -1,0 +1,142 @@
+.table-shell {
+  width: 100%;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead th {
+  text-align: left;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 16px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+tbody td {
+  padding: 16px;
+  border-bottom: 1px solid #eef2f7;
+  font-size: 15px;
+  color: #334155;
+  vertical-align: middle;
+}
+
+tbody tr:hover {
+  background: #fafcff;
+}
+
+.task-title {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.loading-state {
+  display: grid;
+  gap: 14px;
+  padding-top: 8px;
+}
+
+.skeleton-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1.4fr;
+  gap: 14px;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid #eef2f7;
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #e2e8f0 25%, #f8fafc 50%, #e2e8f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite linear;
+  border-radius: 10px;
+}
+
+.skeleton-text {
+  height: 16px;
+}
+
+.skeleton-text.long {
+  width: 85%;
+}
+
+.skeleton-text.short {
+  width: 65%;
+}
+
+.skeleton-badge {
+  width: 78px;
+  height: 30px;
+  border-radius: 999px;
+}
+
+.skeleton-actions {
+  width: 140px;
+  height: 34px;
+}
+
+.error-state {
+  padding: 18px;
+  border-radius: 14px;
+  background: #fee2e2;
+  color: #b91c1c;
+  font-weight: 600;
+}
+
+.empty-state {
+  text-align: center;
+  color: #64748b;
+  padding: 32px 16px;
+
+  h3 {
+    margin-bottom: 8px;
+    color: #0f172a;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .skeleton-row {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .skeleton-actions,
+  .skeleton-badge,
+  .skeleton-text.long,
+  .skeleton-text.short {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .actions {
+    flex-direction: column;
+  }
+}

@@ -1,0 +1,22 @@
+.ui-card {
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1px solid #eef2f7;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+}
+
+.ui-card-padded {
+  padding: 24px;
+}
+
+.ui-card-progress {
+  border-top: 4px solid #2563eb;
+}
+
+.ui-card-completed {
+  border-top: 4px solid #16a34a;
+}
+
+.ui-card-pending {
+  border-top: 4px solid #d97706;
+}
