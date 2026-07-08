@@ -27,10 +27,15 @@ export class TaskService {
   }
 
  loadTasks(): Observable<Task[]> {
+  console.log('1. loadTasks() called');
+
   return this.http.get<Task[]>(this.apiUrl).pipe(
     tap((tasks) => {
-      console.log('Service response:', tasks);
+      console.log('2. tap executed', tasks);
+
       this.tasksSubject.next(tasks);
+
+      console.log('3. Subject updated');
     })
   );
 }

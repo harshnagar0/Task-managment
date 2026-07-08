@@ -1,28 +1,28 @@
 {
   "tasks": [
     {
-      "id": "2",
+      "id": 2,
       "title": "Connect task service",
       "status": "In Progress",
       "priority": "High",
       "dueDate": "2026-06-29"
     },
     {
-      "id": "3",
+      "id": 3,
       "title": "Add modal popup form",
       "status": "Pending",
       "priority": "Medium",
       "dueDate": "2026-06-30"
     },
     {
-      "id": "4",
+      "id": 4,
       "title": "Create loading state UI",
       "status": "Completed",
       "priority": "Medium",
       "dueDate": "2026-06-26"
     },
     {
-      "id": "5",
+      "id": 5,
       "title": "Style overdue badge",
       "status": "In Progress",
       "priority": "Low",
