@@ -89,38 +89,41 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   constructor(public taskService: TaskService) {}
 
-  ngOnInit(): void {
-    this.isLoading = true;
-    this.hasLoaded = false;
-
-    this.tasksSubscription = this.taskService.tasks$.subscribe((tasks) => {
-      this.tasks = [...tasks];
-    });
-
-    this.loadTasks();
-  }
-
   ngOnDestroy(): void {
     this.tasksSubscription?.unsubscribe();
   }
 
-  loadTasks(): void {
-    this.errorMessage = '';
-    this.isLoading = true;
+ngOnInit(): void {
+  this.isLoading = true;
+  this.hasLoaded = false;
+  this.errorMessage = '';
 
+  this.tasksSubscription = this.taskService.tasks$.subscribe({
+    next: (tasks) => {
+      console.log('tasks$ emitted:', tasks);
+
+      this.tasks = [...tasks];
+
+      this.isLoading = false;
+      this.hasLoaded = true;
+    }
+  });
+
+  if (this.taskService.currentTasks.length === 0) {
     this.taskService.loadTasks().subscribe({
-      next: () => {
-        this.isLoading = false;
-        this.hasLoaded = true;
-      },
       error: (err) => {
-        console.error('Load tasks error:', err);
-        this.errorMessage = 'Unable to load tasks. Please try again.';
+        console.error(err);
+        this.errorMessage = 'Unable to load tasks.';
         this.isLoading = false;
         this.hasLoaded = true;
-      },
+      }
     });
+  } else {
+    this.tasks = [...this.taskService.currentTasks];
+    this.isLoading = false;
+    this.hasLoaded = true;
   }
+}
 
   get filteredTasks(): Task[] {
     return this.tasks
