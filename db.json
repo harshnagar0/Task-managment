@@ -1,32 +1,61 @@
 {
   "tasks": [
     {
-      "id": 2,
-      "title": "Connect task service",
-      "status": "In Progress",
-      "priority": "High",
-      "dueDate": "2026-06-29"
-    },
-    {
-      "id": 3,
+      "id": "3",
       "title": "Add modal popup form",
-      "status": "Pending",
+      "status": "Completed",
       "priority": "Medium",
       "dueDate": "2026-06-30"
     },
     {
-      "id": 4,
-      "title": "Create loading state UI",
-      "status": "Completed",
-      "priority": "Medium",
-      "dueDate": "2026-06-26"
-    },
-    {
-      "id": 5,
+      "id": "5",
       "title": "Style overdue badge",
-      "status": "In Progress",
+      "status": "Completed",
       "priority": "Low",
       "dueDate": "2026-07-02"
+    },
+    {
+      "id": "42mq8d_AjFU",
+      "title": "LEET",
+      "status": "Pending",
+      "priority": "High",
+      "dueDate": "2026-07-10"
+    },
+    {
+      "title": "too yum",
+      "status": "In Progress",
+      "priority": "High",
+      "dueDate": "2026-07-17",
+      "id": "o8Ng7qFitsY"
+    },
+    {
+      "title": "aaaa",
+      "status": "Completed",
+      "priority": "Low",
+      "dueDate": "2026-07-14",
+      "id": "wiEMAzB3IJc"
+    },
+    {
+      "id": "IHEZidi8am8",
+      "title": "gg",
+      "status": "Pending",
+      "priority": "Medium",
+      "dueDate": "2026-07-17"
+    },
+    {
+      "title": "dada",
+      "status": "Completed",
+      "priority": "Medium",
+      "dueDate": "2026-07-07",
+      "id": "jjWV4fIw3Po"
+    },
+    {
+      "id": "fsUKkIQ9YDE",
+      "title": "aaaaa",
+      "status": "Pending",
+      "priority": "High",
+      "dueDate": "2026-07-15"
     }
-  ]
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
 }

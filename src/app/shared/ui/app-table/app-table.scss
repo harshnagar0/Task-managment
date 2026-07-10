@@ -7,8 +7,10 @@
 }
 
 table {
-  width: 100%;
+  width: auto;
+  min-width: 900px;
   border-collapse: collapse;
+  table-layout: fixed;
 }
 
 thead th {
@@ -40,8 +42,9 @@ tbody tr:hover {
 
 .actions {
   display: flex;
+  align-items: stretch;
   gap: 8px;
-  flex-wrap: wrap;
+  min-width: 120px;
 }
 
 .loading-state {
@@ -112,10 +115,62 @@ tbody tr:hover {
   }
 }
 
+.pagination-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0 0;
+  margin-top: 8px;
+  border-top: 1px solid #e9edf5;
+  flex-wrap: wrap;
+}
+
+.pagination-info {
+  font-size: 14px;
+  color: #5b6472;
+  font-weight: 500;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pagination-controls button {
+  border: 1px solid #dbe3f0;
+  background: #ffffff;
+  color: #1f2937;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pagination-controls button:hover:not(:disabled) {
+  background: #f3f7ff;
+  border-color: #bfd0f3;
+}
+
+.pagination-controls button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-controls span {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
 @keyframes shimmer {
   0% {
     background-position: 200% 0;
   }
+
   100% {
     background-position: -200% 0;
   }
@@ -133,10 +188,29 @@ tbody tr:hover {
   .skeleton-text.short {
     width: 100%;
   }
+
+  .pagination-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .pagination-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
 }
 
 @media (max-width: 640px) {
   .actions {
     flex-direction: column;
+  }
+
+  .pagination-controls {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .pagination-controls button {
+    flex: 1 1 auto;
   }
 }

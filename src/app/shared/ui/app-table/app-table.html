@@ -1,5 +1,5 @@
 <div class="table-shell">
-  <div *ngIf="loading" class="loading-state">
+  <div *ngIf="loading && !hasLoaded" class="loading-state">
     <div class="skeleton-row" *ngFor="let item of [1, 2, 3, 4, 5]">
       <div class="skeleton skeleton-text long"></div>
       <div class="skeleton skeleton-badge"></div>
@@ -13,8 +13,16 @@
     {{ errorMessage }}
   </div>
 
-  <div *ngIf="!loading && !errorMessage && hasLoaded" class="table-wrapper">
+  <div *ngIf="hasLoaded && !errorMessage" class="table-wrapper">
     <table *ngIf="data.length > 0; else emptyState">
+      <colgroup>
+        <col style="width: 34%" />
+        <col style="width: 16%" />
+        <col style="width: 16%" />
+        <col style="width: 16%" />
+        <col *ngIf="actions.length > 0" style="width: 18%" />
+      </colgroup>
+
       <thead>
         <tr>
           <th *ngFor="let column of columns">{{ column.label }}</th>
@@ -23,7 +31,7 @@
       </thead>
 
       <tbody>
-        <tr *ngFor="let row of data">
+        <tr *ngFor="let row of paginatedData">
           <td *ngFor="let column of columns">
             <ng-container [ngSwitch]="column.type">
               <app-badge
@@ -59,6 +67,32 @@
         </tr>
       </tbody>
     </table>
+
+    <div *ngIf="data.length > 0" class="pagination-bar">
+      <div class="pagination-info">
+        Showing {{ startItem }} to {{ endItem }} of {{ totalItems }} entries
+      </div>
+
+      <div class="pagination-controls" *ngIf="totalPages > 1">
+        <button
+          type="button"
+          (click)="previousPage()"
+          [disabled]="currentPage === 1"
+        >
+          Previous
+        </button>
+
+        <span>Page {{ currentPage }} of {{ totalPages }}</span>
+
+        <button
+          type="button"
+          (click)="nextPage()"
+          [disabled]="currentPage === totalPages"
+        >
+          Next
+        </button>
+      </div>
+    </div>
 
     <ng-template #emptyState>
       <div class="empty-state">
