@@ -1,4 +1,10 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  NgZone,
+  OnDestroy,
+  OnInit,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
@@ -87,64 +93,97 @@ export class DashboardComponent implements OnInit, OnDestroy {
     dueDate: '',
   };
 
-  constructor(public taskService: TaskService) {}
+  constructor(
+    public taskService: TaskService,
+    private cdr: ChangeDetectorRef,
+    private ngZone: NgZone
+  ) {}
+
+  ngOnInit(): void {
+    this.isLoading = true;
+    this.hasLoaded = false;
+    this.errorMessage = '';
+
+    this.tasksSubscription = this.taskService.tasks$.subscribe({
+      next: (tasks) => {
+        this.ngZone.run(() => {
+          this.tasks = [...tasks];
+          this.isLoading = false;
+          this.hasLoaded = true;
+          this.cdr.detectChanges();
+        });
+      },
+      error: (err) => {
+        console.error('Tasks subscription error:', err);
+        this.ngZone.run(() => {
+          this.errorMessage = 'Unable to load tasks.';
+          this.isLoading = false;
+          this.hasLoaded = true;
+          this.cdr.detectChanges();
+        });
+      },
+    });
+
+    if (this.taskService.currentTasks.length === 0) {
+      this.taskService.loadTasks().subscribe({
+        next: () => {
+          this.ngZone.run(() => {
+            this.tasks = [...this.taskService.currentTasks];
+            this.isLoading = false;
+            this.hasLoaded = true;
+            this.cdr.detectChanges();
+          });
+        },
+        error: (err) => {
+          console.error('Load tasks error:', err);
+          this.ngZone.run(() => {
+            this.errorMessage = 'Unable to load tasks.';
+            this.isLoading = false;
+            this.hasLoaded = true;
+            this.cdr.detectChanges();
+          });
+        },
+      });
+    } else {
+      this.tasks = [...this.taskService.currentTasks];
+      this.isLoading = false;
+      this.hasLoaded = true;
+      this.cdr.detectChanges();
+    }
+  }
 
   ngOnDestroy(): void {
     this.tasksSubscription?.unsubscribe();
   }
 
-ngOnInit(): void {
-  this.isLoading = true;
-  this.hasLoaded = false;
-  this.errorMessage = '';
+  toggleForm(): void {
+    this.showForm = !this.showForm;
 
-  this.tasksSubscription = this.taskService.tasks$.subscribe({
-    next: (tasks) => {
-      console.log('tasks$ emitted:', tasks);
-
-      this.tasks = [...tasks];
-
-      this.isLoading = false;
-      this.hasLoaded = true;
+    if (!this.showForm) {
+      this.resetForm();
     }
-  });
-
-  if (this.taskService.currentTasks.length === 0) {
-    this.taskService.loadTasks().subscribe({
-      error: (err) => {
-        console.error(err);
-        this.errorMessage = 'Unable to load tasks.';
-        this.isLoading = false;
-        this.hasLoaded = true;
-      }
-    });
-  } else {
-    this.tasks = [...this.taskService.currentTasks];
-    this.isLoading = false;
-    this.hasLoaded = true;
   }
-}
 
   get filteredTasks(): Task[] {
-    return this.tasks
-      .filter((task) => {
-        const matchesSearch = task.title
-          .toLowerCase()
-          .includes(this.searchText.toLowerCase());
+  return this.tasks
+    .filter((task) => task.status !== 'Completed')
+    .filter((task) => {
+      const matchesSearch = task.title
+        .toLowerCase()
+        .includes(this.searchText.toLowerCase());
 
-        const matchesStatus =
-          this.statusFilter === 'All' || task.status === this.statusFilter;
+      const matchesStatus =
+        this.statusFilter === 'All' || task.status === this.statusFilter;
 
-        const matchesPriority =
-          this.priorityFilter === 'All' || task.priority === this.priorityFilter;
+      const matchesPriority =
+        this.priorityFilter === 'All' || task.priority === this.priorityFilter;
 
-        return matchesSearch && matchesStatus && matchesPriority;
-      })
-      .sort(
-        (a, b) => this.getDateValue(a.dueDate) - this.getDateValue(b.dueDate)
-      )
-      .slice(0, 3);
-  }
+      return matchesSearch && matchesStatus && matchesPriority;
+    })
+    .sort(
+      (a, b) => this.getDateValue(a.dueDate) - this.getDateValue(b.dueDate)
+    );
+}
 
   get totalTasks(): number {
     return this.tasks.length;
@@ -183,14 +222,6 @@ ngOnInit(): void {
     return dueDate < today;
   }
 
-  toggleForm(): void {
-    this.showForm = !this.showForm;
-
-    if (!this.showForm) {
-      this.resetForm();
-    }
-  }
-
   addOrUpdateTask(): void {
     if (!this.newTask.title.trim() || !this.newTask.dueDate.trim()) {
       alert('Please fill in task title and due date.');
@@ -208,27 +239,41 @@ ngOnInit(): void {
 
       this.taskService.updateTask(updatedTask).subscribe({
         next: () => {
-          this.savingTask = false;
-          this.resetForm();
-          this.showForm = false;
+          this.ngZone.run(() => {
+            this.tasks = [...this.taskService.currentTasks];
+            this.savingTask = false;
+            this.resetForm();
+            this.showForm = false;
+            this.cdr.detectChanges();
+          });
         },
         error: (err) => {
           console.error('Update task error:', err);
-          this.errorMessage = 'Unable to update task.';
-          this.savingTask = false;
+          this.ngZone.run(() => {
+            this.errorMessage = 'Unable to update task.';
+            this.savingTask = false;
+            this.cdr.detectChanges();
+          });
         },
       });
     } else {
       this.taskService.addTask(this.newTask).subscribe({
         next: () => {
-          this.savingTask = false;
-          this.resetForm();
-          this.showForm = false;
+          this.ngZone.run(() => {
+            this.tasks = [...this.taskService.currentTasks];
+            this.savingTask = false;
+            this.resetForm();
+            this.showForm = false;
+            this.cdr.detectChanges();
+          });
         },
         error: (err) => {
           console.error('Add task error:', err);
-          this.errorMessage = 'Unable to add task.';
-          this.savingTask = false;
+          this.ngZone.run(() => {
+            this.errorMessage = 'Unable to add task.';
+            this.savingTask = false;
+            this.cdr.detectChanges();
+          });
         },
       });
     }
@@ -244,20 +289,28 @@ ngOnInit(): void {
 
     this.editingTaskId = task.id;
     this.showForm = true;
+    this.cdr.detectChanges();
   }
 
-  deleteTask(id: number): void {
-    this.deletingTaskId = id;
-    this.errorMessage = '';
+  deleteTask(taskId: number): void {
+    this.deletingTaskId = taskId;
+    this.cdr.detectChanges();
 
-    this.taskService.deleteTask(id).subscribe({
+    this.taskService.deleteTask(taskId).subscribe({
       next: () => {
-        this.deletingTaskId = null;
+        this.ngZone.run(() => {
+          this.deletingTaskId = null;
+          this.tasks = [...this.taskService.currentTasks];
+          this.cdr.detectChanges();
+        });
       },
-      error: (err) => {
-        console.error('Delete task error:', err);
-        this.errorMessage = 'Unable to delete task.';
-        this.deletingTaskId = null;
+      error: (error) => {
+        console.error('Error deleting task:', error);
+        this.ngZone.run(() => {
+          this.deletingTaskId = null;
+          this.errorMessage = 'Unable to delete task.';
+          this.cdr.detectChanges();
+        });
       },
     });
   }
@@ -267,15 +320,23 @@ ngOnInit(): void {
 
     this.completingTaskId = task.id;
     this.errorMessage = '';
+    this.cdr.detectChanges();
 
     this.taskService.updateTaskStatus(task.id, 'Completed', task).subscribe({
       next: () => {
-        this.completingTaskId = null;
+        this.ngZone.run(() => {
+          this.completingTaskId = null;
+          this.tasks = [...this.taskService.currentTasks];
+          this.cdr.detectChanges();
+        });
       },
       error: (err) => {
         console.error('Complete task error:', err);
-        this.errorMessage = 'Unable to mark task as completed.';
-        this.completingTaskId = null;
+        this.ngZone.run(() => {
+          this.errorMessage = 'Unable to mark task as completed.';
+          this.completingTaskId = null;
+          this.cdr.detectChanges();
+        });
       },
     });
   }
@@ -305,4 +366,7 @@ ngOnInit(): void {
     this.editingTaskId = null;
     this.savingTask = false;
   }
+  get totalItems(): number {
+  return this.filteredTasks.length;
+}
 }

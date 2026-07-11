@@ -9,6 +9,6 @@ import { Component, Input } from '@angular/core';
   styleUrls: ['./app-card.scss'],
 })
 export class AppCardComponent {
-  @Input() variant: 'default' | 'progress' | 'completed' | 'pending' = 'default';
+  @Input() variant: 'default' | 'progress' | 'completed' | 'pending' | 'active' = 'default';
   @Input() padded = true;
 }

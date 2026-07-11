@@ -26,19 +26,13 @@ export class TaskService {
     return this.tasksSubject.value;
   }
 
- loadTasks(): Observable<Task[]> {
-  console.log('1. loadTasks() called');
-
-  return this.http.get<Task[]>(this.apiUrl).pipe(
-    tap((tasks) => {
-      console.log('2. tap executed', tasks);
-
-      this.tasksSubject.next(tasks);
-
-      console.log('3. Subject updated');
-    })
-  );
-}
+  loadTasks(): Observable<Task[]> {
+    return this.http.get<Task[]>(this.apiUrl).pipe(
+      tap((tasks) => {
+        this.tasksSubject.next([...tasks]);
+      })
+    );
+  }
 
   addTask(task: Omit<Task, 'id'>): Observable<Task> {
     return this.http.post<Task>(this.apiUrl, task).pipe(
@@ -52,7 +46,9 @@ export class TaskService {
     return this.http.put<Task>(`${this.apiUrl}/${task.id}`, task).pipe(
       tap((updatedTask) => {
         this.tasksSubject.next(
-          this.currentTasks.map((t) => (t.id === updatedTask.id ? updatedTask : t))
+          this.currentTasks.map((t) =>
+            t.id === updatedTask.id ? updatedTask : t
+          )
         );
       })
     );
@@ -74,7 +70,9 @@ export class TaskService {
     return this.http.put<Task>(`${this.apiUrl}/${id}`, { ...task, status }).pipe(
       tap((updatedTask) => {
         this.tasksSubject.next(
-          this.currentTasks.map((t) => (t.id === updatedTask.id ? updatedTask : t))
+          this.currentTasks.map((t) =>
+            t.id === updatedTask.id ? updatedTask : t
+          )
         );
       })
     );
