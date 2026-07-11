@@ -366,4 +366,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.editingTaskId = null;
     this.savingTask = false;
   }
+  get totalItems(): number {
+  return this.filteredTasks.length;
+}
 }
